@@ -2,6 +2,7 @@ package universe
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -29,14 +30,23 @@ func parse(file *os.File) ([][]bool, error) {
 	var pattern [][]bool
 
 	scanner := bufio.NewScanner(file)
-	// validate the file header
 	// validate equal row length too
 
 	var i int
+	var rowLen int
 	for scanner.Scan() {
 		line := strings.Split(scanner.Text(), "")
-		var row []bool
 
+		// Ignore comments
+		if line[0] == "!" {
+			continue
+		}
+
+		if rowLen != 0 && len(line) != rowLen {
+			return nil, errors.New("all rows must be of equal length")
+		}
+
+		var row []bool
 		for j := 0; j < len(line); j++ {
 			switch line[j] {
 			case "O":
@@ -49,6 +59,7 @@ func parse(file *os.File) ([][]bool, error) {
 		}
 
 		pattern = append(pattern, row)
+		rowLen = len(row)
 		i++
 	}
 

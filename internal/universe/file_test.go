@@ -2,33 +2,58 @@ package universe_test
 
 import (
 	"conway/internal/universe"
-	"fmt"
 	"testing"
 )
 
 func TestUniverse_FromFile(t *testing.T) {
 	tests := []struct {
-		path string
-		want universe.Universe
+		desc   string
+		path   string
+		uni    universe.Universe
+		errMsg string
 	}{
 		{
+			"It creates a universe from file",
 			"fixtures/basic.cells",
 			universe.Universe{
 				{true, false},
 				{false, true},
 			},
+			"",
+		},
+		{
+			"It ignores the header of the file",
+			"fixtures/header.cells",
+			universe.Universe{
+				{true, false},
+				{false, true},
+			},
+			"",
+		},
+		{
+			"It returns an error when the data contains invalid dimensions",
+			"fixtures/invalid_dimensions.cells",
+			nil,
+			"could not parse file: all rows must be of equal length",
+		},
+		{
+			"It returns an error when the data contains invalid characters",
+			"fixtures/invalid_characters.cells",
+			nil,
+			"could not parse file: invalid character #",
 		},
 	}
+
 	for _, tt := range tests {
-		testname := fmt.Sprintf("From fixture %s", tt.path)
-		t.Run(testname, func(t *testing.T) {
+		t.Run(tt.desc, func(t *testing.T) {
 			got, err := universe.FromFile(tt.path)
-			if err != nil {
-				panic(err)
+
+			if err != nil && err.Error() != tt.errMsg {
+				t.Errorf("\ngot: \n%v\nwant: \n%v\n", err, tt.errMsg)
 			}
 
-			if !got.Equals(tt.want) {
-				t.Errorf("\ngot: \n%v\nwant: \n%v\n", got, tt.want)
+			if !got.Equals(tt.uni) {
+				t.Errorf("\ngot: \n%v\nwant: \n%v\n", got, tt.uni)
 			}
 		})
 	}
