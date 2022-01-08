@@ -6,5 +6,6 @@ const (
 	None Command = iota
 	Forward
 	Back
+	TogglePlay
 	Exit
 )

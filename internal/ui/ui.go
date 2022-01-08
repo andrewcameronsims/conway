@@ -4,6 +4,7 @@ import (
 	"conway/internal/ui/command"
 	"conway/internal/ui/term"
 	"conway/internal/universe"
+	"time"
 )
 
 type UI struct {
@@ -27,10 +28,38 @@ func (ui *UI) Run() {
 	}
 }
 
+func (ui *UI) Play() {
+	ch := make(chan command.Command, 1)
+	go func() {
+		ch <- ui.context.Command()
+	}()
+
+	for {
+		// check for pause command, otherwise play a step
+		if len(ch) == cap(ch) {
+			cmd := <-ch
+			if cmd == command.TogglePlay {
+				return
+			}
+		}
+
+		ui.Forward(1)
+		ui.Render()
+		ui.wait()
+	}
+}
+
+func (ui *UI) wait() {
+	// Make this configurable
+	time.Sleep(time.Millisecond * 250)
+}
+
 func (ui *UI) NextCommand() {
 	cmd := ui.context.Command()
 
 	switch cmd {
+	case command.TogglePlay:
+		ui.Play()
 	case command.Back:
 		ui.Back(1)
 	case command.Forward:

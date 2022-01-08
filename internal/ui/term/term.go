@@ -78,6 +78,8 @@ func (c Context) Command() command.Command {
 			return command.Back
 		case tcell.KeyRight:
 			return command.Forward
+		case tcell.KeyEnter:
+			return command.TogglePlay
 		default:
 			return command.Exit
 		}
