@@ -3,6 +3,8 @@ package command
 type Command int
 
 const (
-	Forward Command = iota
+	None Command = iota
+	Forward
 	Back
+	Exit
 )

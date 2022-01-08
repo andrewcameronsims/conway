@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"conway/internal/ui/command"
 	"conway/internal/ui/term"
 	"conway/internal/universe"
 )
@@ -15,7 +16,27 @@ func NewTermUI(init universe.Universe) *UI {
 	return &UI{
 		history: []universe.Universe{init},
 		current: 0,
-		context: term.Context{},
+		context: term.NewContext(),
+	}
+}
+
+func (ui *UI) Run() {
+	for {
+		ui.Render()
+		ui.NextCommand()
+	}
+}
+
+func (ui *UI) NextCommand() {
+	cmd := ui.context.Command()
+
+	switch cmd {
+	case command.Back:
+		ui.Back(1)
+	case command.Forward:
+		ui.Forward(1)
+	case command.Exit:
+		ui.context.Exit()
 	}
 }
 

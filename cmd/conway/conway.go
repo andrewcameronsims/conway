@@ -24,6 +24,5 @@ func main() {
 	}
 
 	ui := ui.NewTermUI(uni)
-	ui.Render()
-	os.Exit(0)
+	ui.Run()
 }

@@ -8,4 +8,5 @@ import (
 type Context interface {
 	Render(universe.Universe)
 	Command() command.Command
+	Exit()
 }
