@@ -29,23 +29,28 @@ func (ui *UI) Run() {
 }
 
 func (ui *UI) Play() {
+	// TODO: There is a bug here to fix:
+	// 1. press play
+	// 2. press some other key
+	// 3. pause does not work
+	// I think it is because the channel is full
+	// and cannot receive subsequent pause command
 	ch := make(chan command.Command, 1)
 	go func() {
 		ch <- ui.context.Command()
 	}()
 
 	for {
-		// check for pause command, otherwise play a step
-		if len(ch) == cap(ch) {
-			cmd := <-ch
+		select {
+		case cmd := <-ch:
 			if cmd == command.TogglePlay {
 				return
 			}
+		default:
+			ui.Forward(1)
+			ui.Render()
+			ui.wait()
 		}
-
-		ui.Forward(1)
-		ui.Render()
-		ui.wait()
 	}
 }
 
